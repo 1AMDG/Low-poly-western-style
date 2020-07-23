@@ -7,6 +7,7 @@ public class BasicPlayerControl : MonoBehaviour
 {
     public CharacterController controller;
     public Transform cam;
+    public Animator anim;
     
     public float walkSpeed = 6f;
 
