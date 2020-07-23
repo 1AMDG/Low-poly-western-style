@@ -2,22 +2,39 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-//tutorial on Brackeys yt "THIRD PERSON MOVEMENT in Unity"
+//movement part on Brackeys yt "THIRD PERSON MOVEMENT in Unity"
 public class BasicPlayerControl : MonoBehaviour
 {
     public CharacterController controller;
     public Transform cam;
     public Animator anim;
+
+    bool isIdle;
+    bool isWalking;
+    bool isRunning;
+    bool isJumping;
+    bool isCrouching;
+    bool isRolling;
     
-    public float walkSpeed = 6f;
+    public float walkSpeed = 1.25f;
 
     public float turnSmooth = 0.1f;
     float turnSmoothVelocity;
+    void Start(){
+        
+        isIdle = true;
+        isWalking = false;
+        isRunning = false;
+        isJumping = false;
+        isCrouching = false;
+        isRolling = false;
+        
+    }
 
     void Update()
     {
-        float xmove = Input.GetAxisRaw("Horizontal");
-        float zmove = Input.GetAxisRaw("Vertical");
+        float xmove = Input.GetAxis("Horizontal");
+        float zmove = Input.GetAxis("Vertical");
         Vector3 turnDirection = new Vector3(xmove, 0f, zmove).normalized;
 
         if (turnDirection.magnitude >= 0.1f){
@@ -28,14 +45,48 @@ public class BasicPlayerControl : MonoBehaviour
             
             Vector3 moveDirection = Quaternion.Euler(0f, targetDirection, 0f) * Vector3.forward;
             controller.Move(moveDirection.normalized * walkSpeed * Time.deltaTime);
+        }  
+
+        if (xmove == 0 && zmove == 0){
+            anim.SetBool("isIdle", true);
+            anim.SetBool("isWalking", false);
+            anim.SetBool("isRunning", false); 
+            isRunning = false;
+            isIdle = true;
+            isWalking = false;
+            isRunning = false;
+            isJumping = false;
+            isCrouching = false;
+            isRolling = false;
         }
+        else if(((xmove != 0 || zmove != 0) || (xmove != 0 && zmove != 0)) && !Input.GetKey(KeyCode.LeftShift)) {
+            anim.SetBool("isWalking", true);
+            anim.SetBool("isIdle", false);
+            anim.SetBool("isRunning", false); 
+            isRunning = false;
+            isIdle = false;
+            isWalking = true;
+            isRunning = false;
+            isJumping = false;
+            isCrouching = false;
+            isRolling = false;
+        }
+        else if(((xmove != 0 || zmove != 0) || (xmove != 0 && zmove != 0)) && Input.GetKey(KeyCode.LeftShift)){
+            anim.SetBool("isRunning", true);
+            anim.SetBool("isIdle", false);
+            anim.SetBool("isWalking", false);
+            isRunning = true;
+            isIdle = false;
+            isWalking = false;
+            isJumping = false;
+            isCrouching = false;
+            isRolling = false;
 
-
-        // transform.Translate(0,0, zmove);
-        // transform.Translate(xmove,0,0);
-        // turnDirection = (xmove * transform.right + zmove * transform.forward).normalized;
-        // transform.Translate(turnDirection);
-
-
-    }
+        }
+        if (isRunning == true){
+            walkSpeed = 2.5f;
+        } else {
+            walkSpeed = 1.25f;
+        }
+    }   
 }
